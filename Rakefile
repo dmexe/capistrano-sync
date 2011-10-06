@@ -7,6 +7,7 @@ begin
     gemspec.email = "dima.exe@gmail.com"
     gemspec.homepage = "http://github.com/dima-exe/capistrano-sync"
     gemspec.authors = ["Dmitry Galinsky"]
+    gemspec.files = Dir.glob('lib/**/*.rb')
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: gem install jeweler"
