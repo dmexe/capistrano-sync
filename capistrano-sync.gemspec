@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{capistrano-sync}
-  s.version = "0.0.1"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Dmitry Galinsky"]
-  s.date = %q{2011-10-06}
+  s.date = %q{2011-10-07}
   s.description = %q{Sync db or directories recipes for Capistrano}
   s.email = %q{dima.exe@gmail.com}
   s.extra_rdoc_files = [
@@ -20,15 +20,15 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "capistrano-sync.gemspec",
-    "lib/capistrano_sync.rb"
+    "lib/capistrano-sync.rb",
+    "lib/capistrano-sync/sync.rb"
   ]
   s.homepage = %q{http://github.com/dima-exe/capistrano-sync}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
+  s.rubygems_version = %q{1.6.2}
   s.summary = %q{Sync db or directories recipes for Capistrano}
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
