@@ -13,3 +13,7 @@ Defined three task:
 Add to you Gmefile:
 
     gem "capistrano-sync", :git => "git://github.com/dima-exe/capistrano-sync.git"
+
+and to you Capfile:
+    
+    require 'capistrano-sync'
