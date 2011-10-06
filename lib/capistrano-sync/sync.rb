@@ -15,7 +15,7 @@ module CapistranoSyncTask
       cap.logger.info *args
     end
 
-    # missing capture task
+    # missing capture
     def _capture(command, options={})
       output = ""
       cap.invoke_command(command, options.merge(:once => true)) do |ch, stream, data|
@@ -58,9 +58,9 @@ module CapistranoSyncTask
       load_command    = __send__(load_method, local_config)
       ssh_cmd, server = get_ssh_command
 
-      log "Drop and create local database"
+      log "drop and create local database"
       drop_and_create_local_db
-      log "Dump from #{server} and load to local #{local_rails_env} db (see progress)"
+      log "dump from #{server} and load to local #{local_rails_env} db (see progress)"
 
       cmd = "#{ssh_cmd} #{dump_command} | pv | #{load_command}"
       system cmd
@@ -152,12 +152,36 @@ module CapistranoSyncTask
     def sync
       check_deps
       ssh_cmd, server = get_ssh_command
-      log "Download and extract #{server}:#{from} -> local:#{to} (see progress)"
+      log "rsync #{server}:#{from} -> local:#{to} (see progress)"
       cmd = "#{ssh_cmd} \"tar -cC #{from} .\" |pv -s #{total} | tar -x -C #{to}"
+      cmd = [rsync_command, cat_files_command, pv_command, trash_output_command].join(" | ")
       system cmd
     end
 
     private
+
+    def rsync_command
+      server = cap.find_servers.first
+      rsh = "ssh"
+      rsh = "#{rsh} -p #{server.port}" if server.port
+      cmd = "rsync --verbose --archive --compress --copy-links --delete --rsh='#{rsh}'"
+      cmd << " #{cap[:user]}@#{server.host}:#{from}/"
+      cmd << " #{to}/ 2> /dev/null"
+    end
+
+    def cat_files_command
+      t = to.strip.to_s.gsub(/\/$/, '')
+      %{ruby -e "p=l='_' ; begin ; l.strip! ; puts File.read('#{t}/'+p) if File.file?('#{t}/'+p) ; p=l ; end  while l=gets"}
+    end
+
+    def pv_command
+      "pv -s #{total}"
+    end
+
+    def trash_output_command
+      "cat > /dev/null"
+    end
+
     def check_deps
       system "which pv > /dev/null"
       unless ($?.to_i == 0)
@@ -165,9 +189,10 @@ module CapistranoSyncTask
         exit(1)
       end
     end
+
     def total
       unless @total
-        log "Calculate files size"
+        log "calculate files size"
         @total = _capture("du -sb #{from} | awk '{print $1}'", :once => true).to_i
         log "TOTAL: #{proxy.number_to_human_size @total}"
       end
@@ -194,12 +219,12 @@ module CapistranoSyncTask
           namespace :dir do
             desc "sync directory"
             task :default, :roles => :app do
-              from_path = deploy_to + "/" + ENV["FROM"]
-              to_path = ENV["TO"]
-              if !from_path || !to_path
+              if (ENV["FROM"].blank? || ENV["TO"].blank?)
                 puts "Usage cap sync:dir FROM=<..> TO=<..>"
                 exit(1)
               end
+              from_path = deploy_to + "/" + ENV["FROM"]
+              to_path = ENV["TO"]
               s = CapistranoSyncTask::Dir.new(self, from_path, to_path)
               s.sync
             end
