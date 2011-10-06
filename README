@@ -1,0 +1,15 @@
+== capistrano-sync
+
+Recipies for download and replace database or directories from production or staging to development.
+
+Defined three task:
+
+* cap sync:db [RAILS_ENV=env]
+* cap sync:dir FROM=path_relative_to_deploy TO=path
+* cap sync:dir:public_system
+
+== Installation
+
+Add to you Gmefile:
+
+    gem "capistrano-sync", :git => "git://github.com/dima-exe/capistrano-sync.git"
