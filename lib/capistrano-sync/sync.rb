@@ -200,13 +200,13 @@ module CapistranoSyncTask
                 puts "Usage cap sync:dir FROM=<..> TO=<..>"
                 exit(1)
               end
-              s = CapistranoAppSyncTask::Dir.new(self, from_path, to_path)
+              s = CapistranoSyncTask::Dir.new(self, from_path, to_path)
               s.sync
             end
 
             desc "sync public/system directory"
             task :public_system, :roles => :app do
-              s = CapistranoAppSyncTask::Dir.new(self, "#{deploy_to}/current/public/system/", "public/system/")
+              s = CapistranoSyncTask::Dir.new(self, "#{deploy_to}/current/public/system/", "public/system/")
               s.sync
             end
           end
@@ -215,7 +215,7 @@ module CapistranoSyncTask
           task :db, :roles => :db do
             local_rails_env = ENV["RAILS_ENV"] || "development"
             tables = ENV["TABLES"] || ""
-            s = CapistranoAppSyncTask::Db.new(self, rails_env, local_rails_env, tables)
+            s = CapistranoSyncTask::Db.new(self, rails_env, local_rails_env, tables)
             s.sync
           end
         end
