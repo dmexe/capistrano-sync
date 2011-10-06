@@ -26,6 +26,14 @@ module CapistranoSyncTask
       end
       output
     end
+    
+    def check_deps
+      system "which pv 2> /dev/null"
+      unless ($?.to_i == 0)
+        puts "FATAL: pv (Pipe Viewer) command not found, please install 'port install pv' or 'brew install pv'"
+        exit(1)
+      end
+    end
   end
 
   class Db
@@ -40,6 +48,7 @@ module CapistranoSyncTask
     end
 
     def sync
+      check_deps
       remote_config = remote_database_config
       local_config  = local_database_config
 
@@ -180,14 +189,6 @@ module CapistranoSyncTask
 
     def trash_output_command
       "cat > /dev/null"
-    end
-
-    def check_deps
-      system "which pv > /dev/null"
-      unless ($?.to_i == 0)
-        puts "FATAL: pv (Pipe Viewer) command not found, please install 'port install pv' or 'brew install pv'"
-        exit(1)
-      end
     end
 
     def total
